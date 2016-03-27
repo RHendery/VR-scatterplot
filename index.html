@@ -1,0 +1,99 @@
+<-- 
+  @author Rachel Hendery hendery@gmail.com 
+  This creates a 3D virtual reality scatterplot from a csv data file with three numeric coordinate columns (x, y, z) and one or two further text variable columns for colouring the points. The scatterplot can be viewed in a VR headset such as the cardboard. It is simply a webpage that the user can point the mobile phone browser to. (click screen after it loads to get fullscreen mode).
+  
+  The scatterplot code was originally based on Phil Pedruco's 3D scatterplot at http://bl.ocks.org/phil-pedruco/9852362 but has been heavily modified since.
+  
+  May be reused under a Creative Commons licence. Please reference me if you do so, and if you use it for academic purposes, please cite the paper at: https://www.researchgate.net/publication/293334994_Within_these_WALS_An_immersive_exploration_of_linguistic_space 
+  Hendery, Rachel & Siva Kalyan. 2016. Within these WALS: an immersive exploration of linguistic space. Poster at COEDL Summerfest, Sydney, February 2016. DOI: 10.13140/RG.2.1.1171.8162
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cardboard Scatterplot</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+      #scatterplot {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scatterplot"></div>
+
+  <script src="js/third-party/threejs/three.js"></script>
+  <script src="js/third-party/threejs/three.min.js"></script>
+  <script src="js/third-party/threejs/StereoEffect.js"></script>
+  <script src="js/third-party/threejs/DeviceOrientationControls.js"></script>
+  <script src="js/third-party/threejs/OrbitControls.js"></script>
+  <script src="js/third-party/threejs/d3.v3.min.js" charset="utf-8"></script>
+  <script src="js/animate.js"></script>
+  <script src="js/update.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/dataRead.js"></script>
+  <script src="js/helpers.js"></script> 
+  <script src="js/init.js"></script>
+  <script src="js/scatterData.js"></script>
+   <script src="js/createCube.js"></script>
+   <script src="js/createPoints.js"></script>
+
+  <script>
+    var camera, scene, renderer;
+    var effect, controls;
+    var element, container;
+	var flag = 0;
+	var spheresize = 3;
+	var linedensity = 1;  // default is 1. Other possible values are 0 (no lines), 2, (twice as dense) or 3, (3 times as dense). //have not yet implemented!
+	
+	//These are the colour variables. So far a bit hacky. Next feature will be to make them scale using d3's colour scale: get the number of different values in "region" or "family", and select scaled colours for each.
+	var africa_r = 0.19215686274509805;
+   var africa_g = 0.5098039215686274; 
+   var africa_b = 0.7411764705882353; //blue
+   
+   var australia_r = 0.9921568627450981;
+   var australia_g =  0.5529411764705883;
+    var australia_b = 0.23529411764705882; //orange
+	
+	var eurasia_r = 0.9;
+	var eurasia_g = 0.9;
+   	var eurasia_b = 0.5; //yellow
+	
+	var america1_r = 0.9;
+	var america1_g = 0;
+	var america1_b = 0; //red
+	
+	var pap_r = 0;
+	var pap_g = 0.9;
+	var pap_b = 0; // green
+	
+	var america2_r = 0.9;
+	var america2_g = 0;
+	var america2_b = 0.9; //purple
+	
+	
+    var clock = new THREE.Clock();
+	var scatterPlot = new THREE.Object3D();
+	
+
+    dataRead(); //calls function in "dataRead.js" file, which reads in data from WALS.csv and saves it as a data object. It contains a callback function which calls "scatter data", a function in the "scatterData.js" file. That has to be called from in the dataRead callback, otherwise it could try to complete before the file has been (asynchronously) read.
+	
+	
+	init();	//this calls the function in "init.js", which sets up controls, renderer, camera, and lighting.
+	
+    animate(); //this in turn calls update() and render() etc.
+
+ 
+	
+  </script>
+  </body>
+</html>
